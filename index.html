@@ -19,33 +19,42 @@ const widgetHTML = `
 
 document.body.innerHTML = widgetHTML;
 
-// Function to fetch Twitch data
+// Function to fetch Twitch data using the public client ID
 async function fetchTwitchData(username) {
   try {
-    // Fetch public data from TwitchTracker (HTML scraping as no API is available)
-    const response = await fetch(`https://twitchtracker.com/${username}`);
+    const clientId = 'kimne78kx3ncx6brgo4mv6wki5h1ko'; // Public client ID used by many Twitch integrations
 
-    if (!response.ok) {
-      throw new Error(`Streamer not found or error fetching data for ${username}`);
+    // Fetching user data
+    const userResponse = await fetch(`https://api.twitch.tv/helix/users?login=${username}`, {
+      headers: {
+        'Client-ID': clientId,
+        'Authorization': 'Bearer anonymous', // Using anonymous bearer token
+      },
+    });
+
+    if (!userResponse.ok) {
+      throw new Error('Streamer not found');
     }
 
-    const text = await response.text();
+    const userData = await userResponse.json();
+    const user = userData.data[0];
 
-    // Parse the returned HTML
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(text, 'text/html');
+    // Fetching stream data
+    const streamResponse = await fetch(`https://api.twitch.tv/helix/streams?user_id=${user.id}`, {
+      headers: {
+        'Client-ID': clientId,
+        'Authorization': 'Bearer anonymous',
+      },
+    });
 
-    // Extracting relevant data from TwitchTracker's HTML structure
-    const name = doc.querySelector('h1').textContent.trim();
-    const maxViewers = doc.querySelector("#live-stats .card:contains('Max Viewers') .value")?.textContent || 'N/A';
-    const followers = doc.querySelector("#live-stats .card:contains('Followers') .value")?.textContent || 'N/A';
-    const timeStreamed = doc.querySelector("#live-stats .card:contains('Time Streamed') .value")?.textContent || 'N/A';
+    const streamData = await streamResponse.json();
+    const stream = streamData.data[0];
 
     // Updating the widget
-    document.getElementById('streamer-name').textContent = name;
-    document.getElementById('max-viewers').textContent = `Max Viewers: ${maxViewers}`;
-    document.getElementById('followers').textContent = `Followers: ${followers}`;
-    document.getElementById('time-streamed').textContent = `Time Streamed: ${timeStreamed}`;
+    document.getElementById('streamer-name').textContent = user.display_name;
+    document.getElementById('max-viewers').textContent = `Max Viewers: ${stream ? stream.viewer_count : 'Offline'}`;
+    document.getElementById('followers').textContent = `Followers: ${user.view_count}`;
+    document.getElementById('time-streamed').textContent = `Time Streamed: ${stream ? 'Currently streaming' : 'N/A'}`;
   } catch (error) {
     document.getElementById('streamer-name').textContent = 'Error';
     document.getElementById('max-viewers').textContent = error.message;
@@ -55,7 +64,6 @@ async function fetchTwitchData(username) {
 }
 
 // Example usage
-// Replace 'streamer_username' with the desired Twitch streamer's username
 fetchTwitchData('geekfreak_');
 	</script>
 </body>

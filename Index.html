@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twitch Streamer Widget</title>
+</head>
+<body>
+	<script>
+// HTML structure for the widget
+const widgetHTML = `
+  <div id="twitch-widget" style="border: 1px solid #ccc; padding: 20px; width: 300px; font-family: Arial, sans-serif;">
+    <h3 id="streamer-name">Loading...</h3>
+    <p id="max-viewers">Max Viewers: --</p>
+    <p id="followers">Followers: --</p>
+    <p id="time-streamed">Time Streamed: --</p>
+  </div>
+`;
+
+document.body.innerHTML = widgetHTML;
+
+// Function to fetch Twitch data
+async function fetchTwitchData(username) {
+  try {
+    // Fetch public data from TwitchTracker (HTML scraping as no API is available)
+    const response = await fetch(`https://twitchtracker.com/${username}`);
+
+    if (!response.ok) {
+      throw new Error(`Streamer not found or error fetching data for ${username}`);
+    }
+
+    const text = await response.text();
+
+    // Parse the returned HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, 'text/html');
+
+    // Extracting relevant data from TwitchTracker's HTML structure
+    const name = doc.querySelector('h1').textContent.trim();
+    const maxViewers = doc.querySelector("#live-stats .card:contains('Max Viewers') .value")?.textContent || 'N/A';
+    const followers = doc.querySelector("#live-stats .card:contains('Followers') .value")?.textContent || 'N/A';
+    const timeStreamed = doc.querySelector("#live-stats .card:contains('Time Streamed') .value")?.textContent || 'N/A';
+
+    // Updating the widget
+    document.getElementById('streamer-name').textContent = name;
+    document.getElementById('max-viewers').textContent = `Max Viewers: ${maxViewers}`;
+    document.getElementById('followers').textContent = `Followers: ${followers}`;
+    document.getElementById('time-streamed').textContent = `Time Streamed: ${timeStreamed}`;
+  } catch (error) {
+    document.getElementById('streamer-name').textContent = 'Error';
+    document.getElementById('max-viewers').textContent = error.message;
+    document.getElementById('followers').textContent = '';
+    document.getElementById('time-streamed').textContent = '';
+  }
+}
+
+// Example usage
+// Replace 'streamer_username' with the desired Twitch streamer's username
+fetchTwitchData('geekfreak_');
+	</script>
+</body>
+</html>

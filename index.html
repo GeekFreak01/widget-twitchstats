@@ -17,14 +17,17 @@ const widgetHTML = `
   <div id="twitch-widget" style="background-color: #141414; border-radius: 15px; border: none; padding: 10px; width: 350px; font-family: Arial, sans-serif; color: white; display: flex; flex-direction: column;">
     <div style="display: flex; align-items: center; justify-content: space-between;">
       <div style="display: flex; align-items: center;">
-        <img id="avatar" src="" alt="Streamer Avatar" style="width: 50px; height: 50px; border-radius: 50%; display: none; margin-right: 10px;" /> <!-- Avatar placeholder -->
-        <div style="display: flex; align-items: center;">
-          <p id="followers-new" style="color: #4CAF50; margin: 0; font-size: 1em;">+ --</p>
-          <p id="followers-total" style="margin: 0 10px 0 5px; font-size: 1em;">--</p>
-          <p id="status" style="margin: 0; font-size: 0.9em; display: flex; align-items: center;">
-            <span id="status-text">Status: --</span>
-            <span id="status-indicator" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: gray; margin-left: 5px;"></span>
-          </p>
+        <img id="avatar" src="" alt="Streamer Profile" style="width: 50px; height: 50px; border-radius: 50%; display: none; margin-right: 10px;" /> <!-- Avatar placeholder -->
+        <div>
+          <p id="streamer-name" style="margin: 0; font-size: 1.2em;">Streamer: --</p>
+          <div style="display: flex; align-items: center;">
+            <p id="followers-new" style="color: #4CAF50; margin: 0; font-size: 1em;">+ --</p>
+            <p id="followers-total" style="margin: 0 10px 0 5px; font-size: 1em;">--</p>
+            <p id="status" style="margin: 0; font-size: 0.9em; display: flex; align-items: center;">
+              <span id="status-text">Status: --</span>
+              <span id="status-indicator" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: gray; margin-left: 5px;"></span>
+            </p>
+          </div>
         </div>
       </div>
       <div id="rank" style="background-color: yellow; color: black; border-radius: 10px; padding: 3px 6px; font-weight: bold;">R --</div>
@@ -51,6 +54,7 @@ async function fetchTwitchData(username) {
     const data = await response.json();
     const { rank, max_viewers, avg_viewers, minutes_streamed, hours_watched, followers, followers_total, avatar, online } = data;
 
+    document.getElementById('streamer-name').textContent = `${username}`;
     document.getElementById('rank').textContent = `R ${rank ?? '--'}`;
     document.getElementById('max-viewers').textContent = `Max Viewers: ${max_viewers ?? 'N/A'}`;
     document.getElementById('avg-viewers').textContent = `Avg Viewers: ${avg_viewers ?? 'N/A'}`;
@@ -75,6 +79,7 @@ async function fetchTwitchData(username) {
       avatarImg.style.display = 'block';
     }
   } catch (error) {
+    document.getElementById('streamer-name').textContent = 'Error';
     document.getElementById('rank').textContent = '';
     document.getElementById('max-viewers').textContent = error.message;
     document.getElementById('avg-viewers').textContent = '';

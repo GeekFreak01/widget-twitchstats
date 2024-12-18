@@ -17,7 +17,7 @@ const widgetHTML = `
   <div id="twitch-widget" style="background-color: #141414; border-radius: 15px; border: none; padding: 10px; width: 350px; font-family: Arial, sans-serif; color: white; display: flex; flex-direction: column;">
     <div style="display: flex; align-items: center; justify-content: space-between;">
       <div style="display: flex; align-items: center;">
-        <img id="avatar" src="" alt="Streamer Profile" style="width: 50px; height: 50px; border-radius: 50%; display: none; margin-right: 10px;" /> <!-- Avatar placeholder -->
+        <img id="profile_picture" src="" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50%; display: none; margin-right: 10px;" /> <!-- Profile Picture placeholder -->
         <div>
           <p id="streamer-name" style="margin: 0; font-size: 1.2em;">Streamer: --</p>
           <div style="display: flex; align-items: center;">
@@ -69,6 +69,7 @@ async function fetchTwitchData(username) {
       const avatarImg = document.getElementById('avatar');
       avatarImg.src = avatar;
       avatarImg.style.display = 'block';
+      avatarImg.alt = 'Profile Picture';
     }
   } catch (error) {
     document.getElementById('streamer-name').textContent = 'Error';

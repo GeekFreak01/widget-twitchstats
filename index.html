@@ -10,9 +10,10 @@
 // HTML structure for the widget
 const widgetHTML = `
   <div id="twitch-widget" style="border: 1px solid #ccc; padding: 20px; width: 300px; font-family: Arial, sans-serif;">
+    <img id="avatar" src="" alt="Streamer Avatar" style="width: 100px; height: 100px; border-radius: 50%; display: none;" /> <!-- Avatar placeholder -->
     <h3 id="streamer-name">Loading...</h3> <!-- Default loading text for streamer name -->
     <p id="max-viewers">Max Viewers: --</p> <!-- Placeholder for max viewers data -->
-    <p id="followers">Followers: --</p> <!-- Placeholder for followers count -->
+    <p id="total-followers">Total Followers: --</p> <!-- Placeholder for total followers count -->
     <p id="time-streamed">Time Streamed: --</p> <!-- Placeholder for time streamed data -->
   </div>
 `;
@@ -35,18 +36,25 @@ async function fetchTwitchData(username) {
     const data = await response.json();
 
     // Destructure the relevant fields from the API response
-    const { max_viewers, followers, time_streamed } = data;
+    const { max_viewers, total_followers, time_streamed, avatar } = data;
 
     // Update the widget content with the fetched data
     document.getElementById('streamer-name').textContent = `Streamer: ${username}`; // Update streamer name
     document.getElementById('max-viewers').textContent = `Max Viewers: ${max_viewers ?? 'N/A'}`; // Display max viewers or N/A if missing
-    document.getElementById('followers').textContent = `Followers: ${followers ?? 'N/A'}`; // Display followers count or N/A if missing
+    document.getElementById('total-followers').textContent = `Total Followers: ${total_followers ?? 'N/A'}`; // Display total followers count or N/A if missing
     document.getElementById('time-streamed').textContent = `Time Streamed: ${time_streamed ?? 'N/A'}`; // Display time streamed or N/A if missing
+
+    // Update the avatar image if available
+    if (avatar) {
+      const avatarImg = document.getElementById('avatar');
+      avatarImg.src = avatar;
+      avatarImg.style.display = 'block';
+    }
   } catch (error) {
     // Handle any errors that occur during the fetch request
     document.getElementById('streamer-name').textContent = 'Error'; // Show error message in streamer name field
     document.getElementById('max-viewers').textContent = error.message; // Display error message
-    document.getElementById('followers').textContent = ''; // Clear followers field
+    document.getElementById('total-followers').textContent = ''; // Clear followers field
     document.getElementById('time-streamed').textContent = ''; // Clear time streamed field
   }
 }

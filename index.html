@@ -48,7 +48,7 @@ async function fetchTwitchData(username) {
     }
 
     const data = await response.json();
-    const { rank, followers, followers_total, avatar, online } = data;
+    const { rank, followers, followers_total, profile_picture, online } = data;
 
     document.getElementById('streamer-name').textContent = `${username}`;
     document.getElementById('rank').textContent = `R ${rank ?? '--'}`;

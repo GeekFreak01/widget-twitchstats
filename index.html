@@ -14,16 +14,23 @@ const widgetHTML = `
     <button id="load-button" style="padding: 5px;">Load</button>
     <button id="copy-button" style="padding: 5px; margin-left: 5px;">Copy Link</button>
   </div>
-  <div id="twitch-widget" style="border: 1px solid #ccc; padding: 10px; width: 200px; font-family: Arial, sans-serif;">
-    <img id="avatar" src="" alt="Streamer Avatar" style="width: 50px; height: 50px; border-radius: 50%; display: none; margin-bottom: 5px;" /> <!-- Avatar placeholder -->
-    <h3 id="streamer-name">Loading...</h3> <!-- Default loading text for streamer name -->
-    <p id="rank">Rank: --</p> <!-- Placeholder for rank -->
-    <p id="max-viewers">Max Viewers: --</p> <!-- Placeholder for max viewers data -->
-    <p id="avg-viewers">Avg Viewers: --</p> <!-- Placeholder for average viewers -->
-    <p id="minutes-streamed">Minutes Streamed: --</p> <!-- Placeholder for minutes streamed -->
-    <p id="hours-watched">Hours Watched: --</p> <!-- Placeholder for hours watched -->
-    <p id="followers">Followers: --</p> <!-- Placeholder for followers count -->
-    <p id="followers-total">Total Followers: --</p> <!-- Placeholder for total followers -->
+  <div id="twitch-widget" style="border: 1px solid #ccc; padding: 10px; width: 300px; font-family: Arial, sans-serif; display: flex; flex-direction: column;">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center;">
+        <img id="avatar" src="" alt="Streamer Avatar" style="width: 50px; height: 50px; border-radius: 50%; display: none; margin-right: 10px;" /> <!-- Avatar placeholder -->
+        <div>
+          <h3 id="streamer-name" style="margin: 0; font-size: 1.2em;">Loading...</h3>
+          <p id="status" style="margin: 0; font-size: 0.9em;">Status: <span id="status-indicator" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: gray; margin-left: 5px;"></span></p>
+        </div>
+      </div>
+      <div id="rank" style="background-color: yellow; border-radius: 10px; padding: 3px 6px; font-weight: bold;">R --</div>
+    </div>
+    <p id="max-viewers" style="margin: 5px 0;">Max Viewers: --</p> <!-- Placeholder for max viewers data -->
+    <p id="avg-viewers" style="margin: 5px 0;">Avg Viewers: --</p> <!-- Placeholder for average viewers -->
+    <p id="minutes-streamed" style="margin: 5px 0;">Minutes Streamed: --</p> <!-- Placeholder for minutes streamed -->
+    <p id="hours-watched" style="margin: 5px 0;">Hours Watched: --</p> <!-- Placeholder for hours watched -->
+    <p id="followers" style="margin: 5px 0;">Followers: --</p> <!-- Placeholder for followers count -->
+    <p id="followers-total" style="margin: 5px 0;">Total Followers: --</p> <!-- Placeholder for total followers -->
   </div>
 `;
 
@@ -40,16 +47,27 @@ async function fetchTwitchData(username) {
     }
 
     const data = await response.json();
-    const { rank, max_viewers, avg_viewers, minutes_streamed, hours_watched, followers, followers_total, avatar } = data;
+    const { rank, max_viewers, avg_viewers, minutes_streamed, hours_watched, followers, followers_total, avatar, online } = data;
 
     document.getElementById('streamer-name').textContent = username;
-    document.getElementById('rank').textContent = `Rank: ${rank ?? 'N/A'}`;
+    document.getElementById('rank').textContent = `R ${rank ?? '--'}`;
     document.getElementById('max-viewers').textContent = `Max Viewers: ${max_viewers ?? 'N/A'}`;
     document.getElementById('avg-viewers').textContent = `Avg Viewers: ${avg_viewers ?? 'N/A'}`;
     document.getElementById('minutes-streamed').textContent = `Minutes Streamed: ${minutes_streamed ?? 'N/A'}`;
     document.getElementById('hours-watched').textContent = `Hours Watched: ${hours_watched ?? 'N/A'}`;
     document.getElementById('followers').textContent = `Followers: ${followers ?? 'N/A'}`;
     document.getElementById('followers-total').textContent = `Total Followers: ${followers_total ?? 'N/A'}`;
+
+    // Update status and status indicator
+    const statusIndicator = document.getElementById('status-indicator');
+    const statusText = document.getElementById('status');
+    if (online) {
+      statusText.textContent = 'Online';
+      statusIndicator.style.backgroundColor = 'red';
+    } else {
+      statusText.textContent = 'Offline';
+      statusIndicator.style.backgroundColor = 'gray';
+    }
 
     if (avatar) {
       const avatarImg = document.getElementById('avatar');
@@ -74,13 +92,13 @@ document.getElementById('load-button').addEventListener('click', () => {
   if (streamerName) fetchTwitchData(streamerName);
 });
 
-// Event listener to copy a unique link to the clipboard
+// Event listener to copy a simple link to the clipboard
 document.getElementById('copy-button').addEventListener('click', () => {
   const streamerName = document.getElementById('streamer-input').value.trim();
   if (streamerName) {
-    const uniqueLink = `${window.location.origin}?streamer=${encodeURIComponent(streamerName)}`;
-    navigator.clipboard.writeText(uniqueLink).then(() => {
-      alert('Link copied to clipboard: ' + uniqueLink);
+    const simpleLink = `${window.location.origin}/?streamer=${encodeURIComponent(streamerName)}`;
+    navigator.clipboard.writeText(simpleLink).then(() => {
+      alert('Link copied to clipboard: ' + simpleLink);
     }).catch(() => {
       alert('Failed to copy link.');
     });
@@ -96,7 +114,6 @@ if (streamerFromURL) {
   document.getElementById('streamer-input').value = streamerFromURL;
   fetchTwitchData(streamerFromURL);
 }
-
 	</script>
 </body>
 </html>

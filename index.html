@@ -17,6 +17,7 @@ const widgetHTML = `
   <div id="twitch-widget" style="background-color: #141414; border-radius: 15px; border: none; padding: 10px; width: 350px; font-family: Arial, sans-serif; color: white; display: flex; flex-direction: column;">
     <div style="display: flex; align-items: center; justify-content: space-between;">
       <div style="display: flex; align-items: center;">
+        <img id="profile_picture" src="" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50%; display: none; margin-right: 10px;" /> <!-- Profile Picture placeholder -->
         <img id="avatar" src="" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50%; display: none; margin-right: 10px;" /> <!-- Profile Picture placeholder -->
         <div>
           <p id="streamer-name" style="margin: 0; font-size: 1.2em;">Streamer: --</p>
@@ -49,6 +50,7 @@ async function fetchTwitchData(username) {
 
     const data = await response.json();
     const { rank, followers, followers_total, profile_picture, online } = data;
+    const { rank, followers, followers_total, avatar, online } = data;
 
     document.getElementById('streamer-name').textContent = `${username}`;
     document.getElementById('rank').textContent = `R ${rank ?? '--'}`;
@@ -57,10 +59,7 @@ async function fetchTwitchData(username) {
 
     const statusIndicator = document.getElementById('status-indicator');
     const statusText = document.getElementById('status-text');
-
-    // Use Twitch Live Circle logic for checking online status
-    const liveResponse = await fetch(`https://twitchtracker.com/${username}/twitch-live-circle`);
-    if (liveResponse.ok) {
+    if (online) {
       statusText.textContent = 'Online';
       statusIndicator.style.backgroundColor = 'red';
     } else {
@@ -68,9 +67,9 @@ async function fetchTwitchData(username) {
       statusIndicator.style.backgroundColor = 'gray';
     }
 
-    if (profile_picture) {
+    if (avatar) {
       const avatarImg = document.getElementById('avatar');
-      avatarImg.src = profile_picture;
+      avatarImg.src = avatar;
       avatarImg.style.display = 'block';
       avatarImg.alt = 'Profile Picture';
     }

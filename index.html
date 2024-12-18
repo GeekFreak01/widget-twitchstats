@@ -51,7 +51,6 @@ async function fetchTwitchData(username) {
     const data = await response.json();
     const { rank, max_viewers, avg_viewers, minutes_streamed, hours_watched, followers, followers_total, avatar, online } = data;
 
-    document.getElementById('streamer-name').textContent = username;
     document.getElementById('rank').textContent = `R ${rank ?? '--'}`;
     document.getElementById('max-viewers').textContent = `Max Viewers: ${max_viewers ?? 'N/A'}`;
     document.getElementById('avg-viewers').textContent = `Avg Viewers: ${avg_viewers ?? 'N/A'}`;
@@ -60,7 +59,6 @@ async function fetchTwitchData(username) {
     document.getElementById('followers-new').textContent = `+ ${followers ?? '--'}`;
     document.getElementById('followers-total').textContent = `${followers_total ?? '--'}`;
 
-    // Update status and status indicator
     const statusIndicator = document.getElementById('status-indicator');
     const statusText = document.getElementById('status-text');
     if (online) {
@@ -77,7 +75,6 @@ async function fetchTwitchData(username) {
       avatarImg.style.display = 'block';
     }
   } catch (error) {
-    document.getElementById('streamer-name').textContent = 'Error';
     document.getElementById('rank').textContent = '';
     document.getElementById('max-viewers').textContent = error.message;
     document.getElementById('avg-viewers').textContent = '';
@@ -98,7 +95,7 @@ document.getElementById('load-button').addEventListener('click', () => {
 document.getElementById('copy-button').addEventListener('click', () => {
   const streamerName = document.getElementById('streamer-input').value.trim();
   if (streamerName) {
-    const simpleLink = `${window.location.origin}?streamer=${encodeURIComponent(streamerName)}`;
+    const simpleLink = `${window.location.origin}/?streamer=${encodeURIComponent(streamerName)}`;
     navigator.clipboard.writeText(simpleLink).then(() => {
       alert('Link copied to clipboard: ' + simpleLink);
     }).catch(() => {

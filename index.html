@@ -18,9 +18,9 @@ const widgetHTML = `
     <div style="display: flex; align-items: center; justify-content: space-between;">
       <div style="display: flex; align-items: center;">
         <img id="avatar" src="" alt="Streamer Avatar" style="width: 50px; height: 50px; border-radius: 50%; display: none; margin-right: 10px;" /> <!-- Avatar placeholder -->
-        <div>
-          <h3 id="streamer-name" style="margin: 0; font-size: 1.2em;">Loading...</h3>
-          <p id="followers-total" style="margin: 0; font-size: 1em;">-- + --</p>
+        <div style="display: flex; align-items: center;">
+          <p id="followers-new" style="color: #4CAF50; margin: 0; font-size: 1em;">+ --</p>
+          <p id="followers-total" style="margin: 0 10px 0 5px; font-size: 1em;">--</p>
           <p id="status" style="margin: 0; font-size: 0.9em; display: flex; align-items: center;">
             <span id="status-text">Status: --</span>
             <span id="status-indicator" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: gray; margin-left: 5px;"></span>
@@ -57,7 +57,8 @@ async function fetchTwitchData(username) {
     document.getElementById('avg-viewers').textContent = `Avg Viewers: ${avg_viewers ?? 'N/A'}`;
     document.getElementById('minutes-streamed').textContent = `Minutes Streamed: ${minutes_streamed ?? 'N/A'}`;
     document.getElementById('hours-watched').textContent = `Hours Watched: ${hours_watched ?? 'N/A'}`;
-    document.getElementById('followers-total').textContent = `${followers_total ?? '--'} + ${followers ?? '--'}`;
+    document.getElementById('followers-new').textContent = `+ ${followers ?? '--'}`;
+    document.getElementById('followers-total').textContent = `${followers_total ?? '--'}`;
 
     // Update status and status indicator
     const statusIndicator = document.getElementById('status-indicator');
@@ -82,6 +83,7 @@ async function fetchTwitchData(username) {
     document.getElementById('avg-viewers').textContent = '';
     document.getElementById('minutes-streamed').textContent = '';
     document.getElementById('hours-watched').textContent = '';
+    document.getElementById('followers-new').textContent = '';
     document.getElementById('followers-total').textContent = '';
   }
 }

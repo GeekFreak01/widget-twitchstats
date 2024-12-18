@@ -21,9 +21,9 @@ const widgetHTML = `
         <div>
           <p id="streamer-name" style="margin: 0; font-size: 1.2em;">Streamer: --</p>
           <div style="display: flex; align-items: center;">
-            <p id="followers-new" style="color: #4CAF50; margin: 0; font-size: 1em;">+ --</p>
-            <p id="followers-total" style="margin: 0 10px 0 5px; font-size: 1em;">--</p>
-            <p id="status" style="margin: 0; font-size: 0.9em; display: flex; align-items: center;">
+            <p id="followers-total" style="margin: 0; font-size: 1em;">--</p>
+            <p id="followers-new" style="color: #4CAF50; margin: 0 0 0 5px; font-size: 1em;">+ --</p>
+            <p id="status" style="margin: 0 0 0 10px; font-size: 0.9em; display: flex; align-items: center;">
               <span id="status-text">Status: --</span>
               <span id="status-indicator" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: gray; margin-left: 5px;"></span>
             </p>
@@ -32,10 +32,6 @@ const widgetHTML = `
       </div>
       <div id="rank" style="background-color: yellow; color: black; border-radius: 10px; padding: 3px 6px; font-weight: bold;">R --</div>
     </div>
-    <p id="max-viewers" style="margin: 5px 0;">Max Viewers: --</p> <!-- Placeholder for max viewers data -->
-    <p id="avg-viewers" style="margin: 5px 0;">Avg Viewers: --</p> <!-- Placeholder for average viewers -->
-    <p id="minutes-streamed" style="margin: 5px 0;">Minutes Streamed: --</p> <!-- Placeholder for minutes streamed -->
-    <p id="hours-watched" style="margin: 5px 0;">Hours Watched: --</p> <!-- Placeholder for hours watched -->
   </div>
 `;
 
@@ -52,14 +48,10 @@ async function fetchTwitchData(username) {
     }
 
     const data = await response.json();
-    const { rank, max_viewers, avg_viewers, minutes_streamed, hours_watched, followers, followers_total, avatar, online } = data;
+    const { rank, followers, followers_total, avatar, online } = data;
 
     document.getElementById('streamer-name').textContent = `${username}`;
     document.getElementById('rank').textContent = `R ${rank ?? '--'}`;
-    document.getElementById('max-viewers').textContent = `Max Viewers: ${max_viewers ?? 'N/A'}`;
-    document.getElementById('avg-viewers').textContent = `Avg Viewers: ${avg_viewers ?? 'N/A'}`;
-    document.getElementById('minutes-streamed').textContent = `Minutes Streamed: ${minutes_streamed ?? 'N/A'}`;
-    document.getElementById('hours-watched').textContent = `Hours Watched: ${hours_watched ?? 'N/A'}`;
     document.getElementById('followers-new').textContent = `+ ${followers ?? '--'}`;
     document.getElementById('followers-total').textContent = `${followers_total ?? '--'}`;
 
@@ -81,12 +73,10 @@ async function fetchTwitchData(username) {
   } catch (error) {
     document.getElementById('streamer-name').textContent = 'Error';
     document.getElementById('rank').textContent = '';
-    document.getElementById('max-viewers').textContent = error.message;
-    document.getElementById('avg-viewers').textContent = '';
-    document.getElementById('minutes-streamed').textContent = '';
-    document.getElementById('hours-watched').textContent = '';
     document.getElementById('followers-new').textContent = '';
     document.getElementById('followers-total').textContent = '';
+    document.getElementById('status-text').textContent = 'Status: --';
+    document.getElementById('status-indicator').style.backgroundColor = 'gray';
   }
 }
 

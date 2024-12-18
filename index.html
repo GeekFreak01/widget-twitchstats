@@ -10,60 +10,48 @@
 // HTML structure for the widget
 const widgetHTML = `
   <div id="twitch-widget" style="border: 1px solid #ccc; padding: 20px; width: 300px; font-family: Arial, sans-serif;">
-    <h3 id="streamer-name">Loading...</h3>
-    <p id="max-viewers">Max Viewers: --</p>
-    <p id="followers">Followers: --</p>
-    <p id="time-streamed">Time Streamed: --</p>
+    <h3 id="streamer-name">Loading...</h3> <!-- Default loading text for streamer name -->
+    <p id="max-viewers">Max Viewers: --</p> <!-- Placeholder for max viewers data -->
+    <p id="followers">Followers: --</p> <!-- Placeholder for followers count -->
+    <p id="time-streamed">Time Streamed: --</p> <!-- Placeholder for time streamed data -->
   </div>
 `;
 
+// Insert the widget's HTML into the body of the page
 document.body.innerHTML = widgetHTML;
 
-// Function to fetch Twitch data using the public client ID
+// Function to fetch TwitchTracker API data for a specific user
 async function fetchTwitchData(username) {
   try {
-    const clientId = 'kimne78kx3ncx6brgo4mv6wki5h1ko'; // Public client ID used by many Twitch integrations
+    // Send a request to the TwitchTracker API endpoint for the given username
+    const response = await fetch(`https://twitchtracker.com/api/channels/summary/${username}`);
 
-    // Fetching user data
-    const userResponse = await fetch(`https://api.twitch.tv/helix/users?login=${username}`, {
-      headers: {
-        'Client-ID': clientId,
-        'Authorization': 'Bearer anonymous', // Using anonymous bearer token
-      },
-    });
-
-    if (!userResponse.ok) {
-      throw new Error('Streamer not found');
+    // Check if the API response is successful
+    if (!response.ok) {
+      throw new Error('Error fetching data. Streamer may not exist.');
     }
 
-    const userData = await userResponse.json();
-    const user = userData.data[0];
+    // Parse the JSON data returned by the API
+    const data = await response.json();
 
-    // Fetching stream data
-    const streamResponse = await fetch(`https://api.twitch.tv/helix/streams?user_id=${user.id}`, {
-      headers: {
-        'Client-ID': clientId,
-        'Authorization': 'Bearer anonymous',
-      },
-    });
+    // Destructure the relevant fields from the API response
+    const { max_viewers, followers, time_streamed } = data;
 
-    const streamData = await streamResponse.json();
-    const stream = streamData.data[0];
-
-    // Updating the widget
-    document.getElementById('streamer-name').textContent = user.display_name;
-    document.getElementById('max-viewers').textContent = `Max Viewers: ${stream ? stream.viewer_count : 'Offline'}`;
-    document.getElementById('followers').textContent = `Followers: ${user.view_count}`;
-    document.getElementById('time-streamed').textContent = `Time Streamed: ${stream ? 'Currently streaming' : 'N/A'}`;
+    // Update the widget content with the fetched data
+    document.getElementById('streamer-name').textContent = `Streamer: ${username}`; // Update streamer name
+    document.getElementById('max-viewers').textContent = `Max Viewers: ${max_viewers ?? 'N/A'}`; // Display max viewers or N/A if missing
+    document.getElementById('followers').textContent = `Followers: ${followers ?? 'N/A'}`; // Display followers count or N/A if missing
+    document.getElementById('time-streamed').textContent = `Time Streamed: ${time_streamed ?? 'N/A'}`; // Display time streamed or N/A if missing
   } catch (error) {
-    document.getElementById('streamer-name').textContent = 'Error';
-    document.getElementById('max-viewers').textContent = error.message;
-    document.getElementById('followers').textContent = '';
-    document.getElementById('time-streamed').textContent = '';
+    // Handle any errors that occur during the fetch request
+    document.getElementById('streamer-name').textContent = 'Error'; // Show error message in streamer name field
+    document.getElementById('max-viewers').textContent = error.message; // Display error message
+    document.getElementById('followers').textContent = ''; // Clear followers field
+    document.getElementById('time-streamed').textContent = ''; // Clear time streamed field
   }
 }
 
-// Example usage
+// Call the function to fetch data for a specific streamer
 fetchTwitchData('geekfreak_');
 	</script>
 </body>

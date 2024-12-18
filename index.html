@@ -17,7 +17,7 @@ const widgetHTML = `
   <div id="twitch-widget" style="background-color: #141414; border-radius: 15px; border: none; padding: 10px; width: 350px; font-family: Arial, sans-serif; color: white; display: flex; flex-direction: column;">
     <div style="display: flex; align-items: center; justify-content: space-between;">
       <div style="display: flex; align-items: center;">
-        <img id="profile_picture" src="" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50%; display: none; margin-right: 10px;" /> <!-- Profile Picture placeholder -->
+        <img id="avatar" src="" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50%; display: none; margin-right: 10px;" /> <!-- Profile Picture placeholder -->
         <div>
           <p id="streamer-name" style="margin: 0; font-size: 1.2em;">Streamer: --</p>
           <div style="display: flex; align-items: center;">
@@ -48,7 +48,7 @@ async function fetchTwitchData(username) {
     }
 
     const data = await response.json();
-    const { rank, followers, followers_total, profile_picture, online } = data;
+    const { rank, followers, followers_total, avatar, online } = data;
 
     document.getElementById('streamer-name').textContent = `${username}`;
     document.getElementById('rank').textContent = `R ${rank ?? '--'}`;
@@ -109,6 +109,7 @@ if (streamerFromURL) {
   document.getElementById('streamer-input').value = streamerFromURL;
   fetchTwitchData(streamerFromURL);
 }
+
 	</script>
 </body>
 </html>

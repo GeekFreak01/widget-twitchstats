@@ -48,7 +48,7 @@ async function fetchTwitchData(username) {
     }
 
     const data = await response.json();
-    const { rank, followers, followers_total, avatar, online } = data;
+    const { rank, followers, followers_total, profile_picture, online } = data;
 
     document.getElementById('streamer-name').textContent = `${username}`;
     document.getElementById('rank').textContent = `R ${rank ?? '--'}`;
@@ -57,7 +57,10 @@ async function fetchTwitchData(username) {
 
     const statusIndicator = document.getElementById('status-indicator');
     const statusText = document.getElementById('status-text');
-    if (online) {
+
+    // Use Twitch Live Circle logic for checking online status
+    const liveResponse = await fetch(`https://twitchtracker.com/${username}/twitch-live-circle`);
+    if (liveResponse.ok) {
       statusText.textContent = 'Online';
       statusIndicator.style.backgroundColor = 'red';
     } else {
@@ -65,9 +68,9 @@ async function fetchTwitchData(username) {
       statusIndicator.style.backgroundColor = 'gray';
     }
 
-    if (avatar) {
+    if (profile_picture) {
       const avatarImg = document.getElementById('avatar');
-      avatarImg.src = avatar;
+      avatarImg.src = profile_picture;
       avatarImg.style.display = 'block';
       avatarImg.alt = 'Profile Picture';
     }
@@ -109,7 +112,6 @@ if (streamerFromURL) {
   document.getElementById('streamer-input').value = streamerFromURL;
   fetchTwitchData(streamerFromURL);
 }
-
 	</script>
 </body>
 </html>

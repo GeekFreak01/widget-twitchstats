@@ -62,10 +62,15 @@
         document.getElementById('followers-new').textContent = `+ ${followers}`;
         document.getElementById('followers-total').textContent = `${followers_total}`;
 
-        // Устанавливаем статус онлайн/оффлайн
+        // Устанавливаем статус онлайн/оффлайн через парсинг страницы Twitch
+        const twitchPageResponse = await fetch(`https://www.twitch.tv/${username}`);
+        const twitchPageHtml = await twitchPageResponse.text();
+        const isStreamerOnline = twitchPageHtml.includes('"isLiveBroadcast":true');
+
         const statusIndicator = document.getElementById('status-indicator');
         const statusText = document.getElementById('status-text');
-        if (online) {
+
+        if (isStreamerOnline) {
           statusText.textContent = 'Online';
           statusIndicator.style.backgroundColor = 'green';
         } else {

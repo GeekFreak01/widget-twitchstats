@@ -48,13 +48,21 @@
         }
 
         const data = await response.json();
-        const { rank, followers, followers_total, avatar, online } = data;
 
+        // Проверяем структуру данных, чтобы избежать ошибок
+        const rank = data.rank ?? '--';
+        const followers = data.followers ?? '--';
+        const followers_total = data.followers_total ?? '--';
+        const avatar = data.avatar ?? '';
+        const online = data.online === true || data.online === "true"; // Проверяем как булевое, так и строковое значение
+
+        // Обновляем отображение виджета
         document.getElementById('streamer-name').textContent = `${username}`;
-        document.getElementById('rank').textContent = `R ${rank ?? '--'}`;
-        document.getElementById('followers-new').textContent = `+ ${followers ?? '--'}`;
-        document.getElementById('followers-total').textContent = `${followers_total ?? '--'}`;
+        document.getElementById('rank').textContent = `R ${rank}`;
+        document.getElementById('followers-new').textContent = `+ ${followers}`;
+        document.getElementById('followers-total').textContent = `${followers_total}`;
 
+        // Устанавливаем статус онлайн/оффлайн
         const statusIndicator = document.getElementById('status-indicator');
         const statusText = document.getElementById('status-text');
         if (online) {
@@ -65,13 +73,14 @@
           statusIndicator.style.backgroundColor = 'gray';
         }
 
+        // Устанавливаем изображение профиля, если оно доступно
+        const avatarImg = document.getElementById('profile-picture');
         if (avatar) {
-          const avatarImg = document.getElementById('profile-picture');
           avatarImg.src = avatar;
           avatarImg.style.display = 'block';
           avatarImg.alt = `${username}'s Profile Picture`;
         } else {
-          document.getElementById('profile-picture').style.display = 'none';
+          avatarImg.style.display = 'none';
         }
       } catch (error) {
         console.error(error);

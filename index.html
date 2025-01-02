@@ -22,7 +22,6 @@
               <p id="streamer-name" style="margin: 0; font-size: 1.2em;">Streamer: --</p>
               <div style="display: flex; align-items: center;">
                 <p id="followers-total" style="margin: 0; font-size: 1em;">--</p>
-                <p id="followers-new" style="color: #4CAF50; margin: 0 0 0 5px; font-size: 1em;">+ --</p>
                 <p id="status" style="margin: 0 0 0 10px; font-size: 0.9em; display: flex; align-items: center;">
                   <span id="status-text">Status: --</span>
                   <span id="status-indicator" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: gray; margin-left: 5px;"></span>
@@ -30,7 +29,6 @@
               </div>
             </div>
           </div>
-          <div id="rank" style="background-color: yellow; color: black; border-radius: 10px; padding: 3px 6px; font-weight: bold;">R --</div>
         </div>
       </div>
     `;
@@ -38,39 +36,17 @@
     // Insert the widget's HTML into the body of the page
     document.body.innerHTML = widgetHTML;
 
-    // Function to fetch Twitch API data for a specific user
-    async function fetchTwitchData(username) {
+    // Function to fetch streamer online status by scraping Twitch page
+    async function fetchOnlineStatusWithoutAPI(username) {
       try {
-        const headers = {
-          'Client-ID': 'your-client-id', // Replace with your actual Client-ID
-          'Authorization': 'Bearer your-oauth-token' // Replace with your actual OAuth token
-        };
+        const response = await fetch(`https://www.twitch.tv/${username}`);
+        const html = await response.text();
 
-        // Fetch user data
-        let response = await fetch(`https://api.twitch.tv/helix/users?login=${username}`, { headers });
-        let data = await response.json();
-
-        if (!data.data || data.data.length === 0) {
-          throw new Error('Streamer not found');
-        }
-
-        const user = data.data[0];
-
-        // Fetch stream status
-        response = await fetch(`https://api.twitch.tv/helix/streams?user_id=${user.id}`, { headers });
-        let streamData = await response.json();
-
-        const isOnline = streamData.data && streamData.data.length > 0;
+        // Check for specific keywords in the HTML that indicate the streamer is live
+        const isOnline = html.includes('"isLiveBroadcast":true');
 
         // Update widget
-        document.getElementById('streamer-name').textContent = user.display_name;
-        document.getElementById('rank').textContent = `ID: ${user.id}`;
-        document.getElementById('followers-total').textContent = `Followers: N/A`; // Update if follower data is required
-
-        const avatarImg = document.getElementById('profile-picture');
-        avatarImg.src = user.profile_image_url;
-        avatarImg.style.display = 'block';
-
+        document.getElementById('streamer-name').textContent = username;
         const statusIndicator = document.getElementById('status-indicator');
         const statusText = document.getElementById('status-text');
 
@@ -82,10 +58,8 @@
           statusIndicator.style.backgroundColor = 'gray';
         }
       } catch (error) {
-        console.error(error);
+        console.error('Error fetching online status:', error);
         document.getElementById('streamer-name').textContent = 'Error';
-        document.getElementById('rank').textContent = '';
-        document.getElementById('followers-total').textContent = '';
         document.getElementById('status-text').textContent = 'Status: --';
         document.getElementById('status-indicator').style.backgroundColor = 'gray';
       }
@@ -94,31 +68,8 @@
     // Event listener to load streamer data when button is clicked
     document.getElementById('load-button').addEventListener('click', () => {
       const streamerName = document.getElementById('streamer-input').value.trim();
-      if (streamerName) fetchTwitchData(streamerName);
+      if (streamerName) fetchOnlineStatusWithoutAPI(streamerName);
     });
-
-    // Event listener to copy a simple link to the clipboard
-    document.getElementById('copy-button').addEventListener('click', () => {
-      const streamerName = document.getElementById('streamer-input').value.trim();
-      if (streamerName) {
-        const simpleLink = `${window.location.origin}/?streamer=${encodeURIComponent(streamerName)}`;
-        navigator.clipboard.writeText(simpleLink).then(() => {
-          alert('Link copied to clipboard: ' + simpleLink);
-        }).catch(() => {
-          alert('Failed to copy link.');
-        });
-      } else {
-        alert('Please enter a streamer name first.');
-      }
-    });
-
-    // Automatically load data if a streamer parameter exists in the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const streamerFromURL = urlParams.get('streamer');
-    if (streamerFromURL) {
-      document.getElementById('streamer-input').value = streamerFromURL;
-      fetchTwitchData(streamerFromURL);
-    }
   </script>
 </body>
 </html>
